@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balanced Meal Guide</title>
+  <style>
+    body { margin:0; font-family:Arial, sans-serif; background:#f7f6f2; color:#222; }
+    header { background:#7fb77e; color:white; text-align:center; padding:40px 20px; }
+    header h1 { margin:0; font-size:36px; }
+    header p { font-size:18px; }
+    section { max-width:950px; margin:35px auto; padding:20px; }
+    h2 { color:#3f7d58; text-align:center; }
+    .box { background:white; border-radius:14px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.12); margin-bottom:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:18px; }
+    .card { background:white; border-radius:14px; padding:22px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.12); cursor:pointer; transition:0.2s; }
+    .card:hover { transform:translateY(-5px); box-shadow:0 8px 18px rgba(0,0,0,0.18); }
+    .icon { font-size:42px; }
+    .card h3 { color:#3f7d58; }
+    #categoryInfo { display:none; background:#eef7ee; border-left:5px solid #7fb77e; border-radius:10px; padding:20px; margin-top:22px; line-height:1.7; }
+    input { width:100%; padding:12px; font-size:16px; border:1px solid #aaa; border-radius:8px; box-sizing:border-box; margin-top:10px; }
+    button { width:100%; margin-top:12px; padding:12px; background:#7fb77e; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
+    button:hover { background:#5f9b5e; }
+    .resultBox { display:none; margin-top:18px; padding:18px; background:#eef7ee; border-left:5px solid #7fb77e; border-radius:8px; line-height:1.7; }
+    details { background:white; border:1px solid #cde5cd; border-radius:10px; margin:12px 0; padding:12px 16px; }
+    summary { font-weight:bold; color:#3f7d58; cursor:pointer; }
+    footer { background:#3f7d58; color:white; text-align:center; padding:24px; margin-top:40px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Balanced Meal Guide</h1>
+    <p>A simple webpage that helps college students build healthier meals.</p>
+  </header>
+
+  <section>
+    <h2>Click a Food Category</h2>
+    <div class="grid">
+      <div class="card" onclick="showCategory('protein')"><div class="icon">🍗</div><h3>Protein</h3><p>Click to learn more</p></div>
+      <div class="card" onclick="showCategory('carbs')"><div class="icon">🍚</div><h3>Carbohydrates</h3><p>Click to learn more</p></div>
+      <div class="card" onclick="showCategory('vegetables')"><div class="icon">🥦</div><h3>Vegetables</h3><p>Click to learn more</p></div>
+      <div class="card" onclick="showCategory('fats')"><div class="icon">🥑</div><h3>Fats</h3><p>Click to learn more</p></div>
+    </div>
+    <div id="categoryInfo"></div>
+  </section>
+
+  <section>
+    <h2>Create Your Meal</h2>
+    <div class="box">
+      <h3>1. I already have these foods</h3>
+      <p>Type the ingredients you already have. The webpage will show missing categories, cooking steps, and health tips.</p>
+      <input type="text" id="haveFoodInput" placeholder="Example: rice, eggs, broccoli">
+      <button onclick="suggestFromIngredients()">Make a Meal Plan</button>
+      <div id="haveFoodResult" class="resultBox"></div>
+    </div>
+
+    <div class="box">
+      <h3>2. I want to eat this food</h3>
+      <p>Type the food you want to eat. The webpage will show what is missing, how to make it, and simple health tips.</p>
+      <input type="text" id="wantFoodInput" placeholder="Example: noodles, burger, chicken">
+      <button onclick="suggestFromWant()">Make It Balanced</button>
+      <div id="wantFoodResult" class="resultBox"></div>
+    </div>
+  </section>
+
+  <footer><p>Balance is key. No food is “bad” — the goal is to build better habits.</p></footer>
+
+  <script>
+    function showCategory(type) {
+      const info = document.getElementById("categoryInfo");
+      const data = {
+        protein: ["🍗 Protein", "Protein helps your body build and repair muscles. It also helps you feel full for a longer time.", "chicken, fish, eggs, tofu, beans, beef, Greek yogurt"],
+        carbs: ["🍚 Carbohydrates", "Carbohydrates are the body's main energy source. They help students stay focused during classes and studying.", "rice, bread, noodles, pasta, potatoes, oats, cereal"],
+        vegetables: ["🥦 Vegetables", "Vegetables provide fiber, vitamins, and minerals. They help digestion and make meals more balanced.", "broccoli, spinach, carrots, salad, tomatoes, cucumber, peppers"],
+        fats: ["🥑 Fats", "Healthy fats support body function and make meals more satisfying. They should be eaten in smaller amounts.", "avocado, nuts, olive oil, peanut butter, cheese, seeds"]
+      };
+      info.innerHTML = `<h3>${data[type][0]}</h3><p><strong>What it is:</strong> ${data[type][1]}</p><p><strong>Examples:</strong> ${data[type][2]}.</p>`;
+      info.style.display = "block";
+    }
+
+    function checkCategories(food) {
+      return {
+        carbs: food.includes("rice") || food.includes("noodle") || food.includes("bread") || food.includes("potato") || food.includes("pasta") || food.includes("oats"),
+        protein: food.includes("chicken") || food.includes("egg") || food.includes("beef") || food.includes("fish") || food.includes("tofu") || food.includes("beans") || food.includes("yogurt"),
+        vegetables: food.includes("broccoli") || food.includes("salad") || food.includes("spinach") || food.includes("carrot") || food.includes("tomato") || food.includes("cucumber"),
+        fats: food.includes("avocado") || food.includes("nuts") || food.includes("oil") || food.includes("cheese") || food.includes("peanut butter")
+      };
+    }
+
+    function missingText(c) {
+      let missing = [];
+      if (!c.carbs) missing.push("carbohydrates, such as rice, bread, noodles, or potatoes");
+      if (!c.protein) missing.push("protein, such as chicken, eggs, tofu, fish, or beans");
+      if (!c.vegetables) missing.push("vegetables, such as broccoli, salad, spinach, carrots, or tomatoes");
+      if (!c.fats) missing.push("healthy fats, such as avocado, nuts, olive oil, or cheese");
+      return missing.length ? missing : ["No major category is missing. Your meal already looks balanced."];
+    }
+
+    function makeAccordion(title, missing, steps, tips) {
+      return `
+        <details open><summary>Missing Food Categories</summary><p>${missing.map(x => "• " + x).join("<br>")}</p></details>
+        <details><summary>Cooking / Meal Steps</summary><p>${steps.map(x => "• " + x).join("<br>")}</p></details>
+        <details><summary>Healthy Tips</summary><p>${tips.map(x => "• " + x).join("<br>")}</p></details>
+      `;
+    }
+
+    function suggestFromIngredients() {
+      const food = document.getElementById("haveFoodInput").value.toLowerCase().trim();
+      const result = document.getElementById("haveFoodResult");
+      if (food === "") { result.style.display = "block"; result.innerHTML = "Please type the food you already have first."; return; }
+
+      const c = checkCategories(food);
+      const missing = missingText(c);
+      const steps = [
+        "Start with the food you already have: " + food + ".",
+        "Choose one missing category and add a simple food from that group.",
+        "Cook or combine them into one simple bowl, plate, sandwich, or salad.",
+        "Try to keep the meal easy so it fits a busy college schedule."
+      ];
+      const tips = [
+        "Do not add too much salt. Add a small amount first, then taste it.",
+        "Do not add too much sugar, especially in drinks or sauces.",
+        "Drink water with the meal when possible.",
+        "The goal is balance, not restriction."
+      ];
+
+      result.style.display = "block";
+      result.innerHTML = "<strong>Meal plan based on your current ingredients:</strong>" + makeAccordion("ingredients", missing, steps, tips);
+    }
+
+    function suggestFromWant() {
+      const food = document.getElementById("wantFoodInput").value.toLowerCase().trim();
+      const result = document.getElementById("wantFoodResult");
+      if (food === "") { result.style.display = "block"; result.innerHTML = "Please type the food you want to eat first."; return; }
+
+      const c = checkCategories(food);
+      const missing = missingText(c);
+      const steps = [
+        "Keep the food you want to eat: " + food + ".",
+        "Do not remove it completely; instead, add what is missing.",
+        "Add one protein, one vegetable, one carb, or one healthy fat if that category is missing.",
+        "Make a balanced version that still feels realistic and enjoyable."
+      ];
+      const tips = [
+        "Avoid adding too much salt, especially with noodles, fries, pizza, or burgers.",
+        "Avoid adding too much sugar in soda, sweet tea, desserts, or sauces.",
+        "Add vegetables when possible to make the meal lighter and more balanced.",
+        "Healthy eating should be flexible, not stressful."
+      ];
+
+      result.style.display = "block";
+      result.innerHTML = "<strong>Balanced suggestion for what you want to eat:</strong>" + makeAccordion("want", missing, steps, tips);
+    }
+  </script>
+</body>
+</html>
